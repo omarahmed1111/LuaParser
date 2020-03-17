@@ -17,21 +17,19 @@ local pow = S'eE'
 
 local grammar = P {
 	"program",
-	program = (V"Cmd" + V"Exp")^0,
+	program = (V"Cmd" + V"Exp")^1,
 	Cmd = V"var" * token(P("=")) * V"Exp",
-	ExpDash = token(S('+-')) * V"ExpDash",
-	Exp = V"Term" * V"ExpDash",
-	TermDash = token(S('*/')) * V"TermDash",
-	Term = V"Factor" * V"TermDash",
+	Exp = (V"Term" * token(S('+-')) * V"Term")^1 + V"Term",
+	Term = (V"Factor" * token(S('*/')) * V"Factor")^1 + V"Factor",
 	Factor = V"num" + V"var" + (token(P("(")) * V"Exp" * token(P(")"))),
-	num = token(pm * digits * maybe(dot*digits) * maybe(pow*pm*digits)),
-	var = token((lpeg.alpha+P'_') * (lpeg.alnum+P'_')^0),
+	num = token(pm * digits * maybe(dot*digits) * maybe(pow*pm*digits)) ,
+	var = token((lpeg.alpha+P'_') * (lpeg.alnum+P'_')^0) ,
 	spaces = P(lpeg.space)^0,
 }
 
 
 function parse(str)
-	print(str) 
+	--print(str) 
 	local r, e, sfail = grammar:match(str)
 	return r,e
 end	
