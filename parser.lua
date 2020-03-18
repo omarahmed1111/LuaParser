@@ -2,6 +2,7 @@
 
 local lpeg = require 'lpeglabel'
 local re = require 'relabel'
+local tostring = require 'ml'.tstring
 lpeg.locale(lpeg)
 
 local P,R,S,B,V,C,Ct,Cmt,Cp,Cc,T = lpeg.P,lpeg.R,lpeg.S,lpeg.B,lpeg.V,lpeg.C,lpeg.Ct,lpeg.Cmt,
@@ -26,18 +27,19 @@ local terror = {
 
 local grammar = P {
 	"program",
-	program = (V"Cmd" + V"Exp")^0,
-	Cmd = V"var" * token(P("=")) * (V"Exp"+T"expErr"),
-	Exp = V"Term" * (token(S('+-')) * (V"Term"+T"termErr") )^0,
-	Term = V"Factor" * (token(S('*/')) * (V"Factor"+T"factorErr") )^0,
-	Factor = V"num" + V"var" + ( token(P("(")) * (V"Exp"+T"expErr") * (token(P(")")) + T"CloseBrMissing") ),
-	num = token(pm * digits * maybe(dot*digits) * maybe(pow*pm*digits)) ,
-	var = token((lpeg.alpha+P'_') * (lpeg.alnum+P'_')^0) ,
+	program = Ct((V"Cmd" + V"Exp")^0)/tostring,
+	Cmd =  V"var" * token(C(P("="))) * (V"Exp"+T"expErr"),
+	Exp = V"Term" * ( token(C(S('+-'))) * (V"Term"+T"termErr") )^0,
+	Term = V"Factor" * ( token(C(S('*/'))) * (V"Factor"+T"factorErr") )^0,
+	Factor = V"num" + V"var" + ( token(C(P("("))) * (V"Exp"+T"expErr") * (token(C(P(")"))) + T"CloseBrMissing") ),
+	num = token(C(pm * digits * maybe(dot*digits) * maybe(pow*pm*digits))/tonumber) ,
+	var = token(C((lpeg.alpha+P'_') * (lpeg.alnum+P'_')^0)) ,
 	spaces = P(lpeg.space)^0,
 }
 
 local function mymatch(g, s)
   local r, e, pos = g:match(s)
+  --print(pos)
   if not r then
     local line, col = re.calcline(s, pos)
     local msg = "Error at line " .. line .. " (col " .. col .. "): "
