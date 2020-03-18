@@ -26,11 +26,11 @@ local terror = {
 
 local grammar = P {
 	"program",
-	program = (V"Cmd" + V"Exp")^-1,
+	program = (V"Cmd" + V"Exp")^0,
 	Cmd = V"var" * token(P("=")) * (V"Exp"+T"expErr"),
 	Exp = V"Term" * (token(S('+-')) * (V"Term"+T"termErr") )^0,
 	Term = V"Factor" * (token(S('*/')) * (V"Factor"+T"factorErr") )^0,
-	Factor = V"num" + V"var" + (token(P("(")) * V"Exp" * (token(P(")")) + T"CloseBrMissing")),
+	Factor = V"num" + V"var" + ( token(P("(")) * (V"Exp"+T"expErr") * (token(P(")")) + T"CloseBrMissing") ),
 	num = token(pm * digits * maybe(dot*digits) * maybe(pow*pm*digits)) ,
 	var = token((lpeg.alpha+P'_') * (lpeg.alnum+P'_')^0) ,
 	spaces = P(lpeg.space)^0,
@@ -41,19 +41,20 @@ local function mymatch(g, s)
   if not r then
     local line, col = re.calcline(s, pos)
     local msg = "Error at line " .. line .. " (col " .. col .. "): "
-    return r, msg .. terror[e]
+    return r, msg , terror[e]
   end 
-  return r,e
+  return r,e,pos
 end
 
 function parse(str)
 	--print(str) 
-	local r,e = mymatch(grammar,str)
-	return r,e
+	local r,e,err = mymatch(grammar,str)
+	return r,e,err
 end	
 
 local out = {
 parse = parse,
+terror=terror
 }
 return out
 
