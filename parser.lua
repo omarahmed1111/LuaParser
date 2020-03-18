@@ -15,29 +15,46 @@ local pm = maybe(S'+-')
 local dot = ('.')
 local pow = S'eE'
 
+local terror = {
+	ExpErr = "Error matching 'SimpleExp'",
+	termErr = "Error matching 'Term'",
+	factorErr = "Error matching 'Factor'",
+	CloseBrMissing = "Error missing closing bracket"
+}
+
+
 local grammar = P {
 	"program",
-	program = (V"Cmd" + V"Exp")^1,
+	program = (V"Cmd" + V"Exp")^-1,
 	Cmd = V"var" * token(P("=")) * V"Exp",
-	Exp = (V"Term" * token(S('+-')) * V"Term")^1 + V"Term",
-	Term = (V"Factor" * token(S('*/')) * V"Factor")^1 + V"Factor",
-	Factor = V"num" + V"var" + (token(P("(")) * V"Exp" * token(P(")"))),
+	Exp = V"Term" * (token(S('+-')) * (V"Term"+T"termErr") )^0,
+	Term = V"Factor" * (token(S('*/')) * (V"Factor"+T"factorErr") )^0,
+	Factor = V"num" + V"var" + (token(P("(")) * V"Exp" * (token(P(")")) + T"CloseBrMissing")),
 	num = token(pm * digits * maybe(dot*digits) * maybe(pow*pm*digits)) ,
 	var = token((lpeg.alpha+P'_') * (lpeg.alnum+P'_')^0) ,
 	spaces = P(lpeg.space)^0,
 }
 
+local function mymatch(g, s)
+  local r, e, pos = g:match(s)
+  if not r then
+    local line, col = re.calcline(s, pos)
+    local msg = "Error at line " .. line .. " (col " .. col .. "): "
+    return r, msg .. terror[e]
+  end 
+  return r,e
+end
 
 function parse(str)
 	--print(str) 
-	local r, e, sfail = grammar:match(str)
+	local r,e = mymatch(grammar,str)
 	return r,e
 end	
 
-local re = {
+local out = {
 parse = parse,
 }
-return re
+return out
 
 
 
