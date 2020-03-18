@@ -1,5 +1,5 @@
-# LuaParser
-Lua parser using LPegLabel tool
+# TinyParser
+Tiny parser using LPegLabel tool
 
 
 This Repo implements a small parser for a tiny language that contains only addition/subtraction/multiply/divide Statements.
