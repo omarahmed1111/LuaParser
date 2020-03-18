@@ -16,17 +16,18 @@ local dot = ('.')
 local pow = S'eE'
 
 local terror = {
-	ExpErr = "Error matching 'SimpleExp'",
+	expErr = "Error matching 'Exp'",
 	termErr = "Error matching 'Term'",
 	factorErr = "Error matching 'Factor'",
-	CloseBrMissing = "Error missing closing bracket"
+	CloseBrMissing = "Error missing closing bracket",
+	
 }
 
 
 local grammar = P {
 	"program",
 	program = (V"Cmd" + V"Exp")^-1,
-	Cmd = V"var" * token(P("=")) * V"Exp",
+	Cmd = V"var" * token(P("=")) * (V"Exp"+T"expErr"),
 	Exp = V"Term" * (token(S('+-')) * (V"Term"+T"termErr") )^0,
 	Term = V"Factor" * (token(S('*/')) * (V"Factor"+T"factorErr") )^0,
 	Factor = V"num" + V"var" + (token(P("(")) * V"Exp" * (token(P(")")) + T"CloseBrMissing")),

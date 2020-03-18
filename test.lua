@@ -53,3 +53,7 @@ print("'" ..test9 .. "' ->" ..e)
 test10 = " id   = 8+7*(88+9) + ((7e2*3 -(88.4+5.3))"
 r, e = parse(test10)
 print("'" ..test10 .. "' ->" ..e)
+
+test11 = " id   ="
+r, e = parse(test11)
+print("'" ..test11 .. "' ->" ..e)
