@@ -20,49 +20,23 @@ local terror = {
 	expErr = "Error matching 'Exp'",
 	termErr = "Error matching 'Term'",
 	factorErr = "Error matching 'Factor'",
-	CloseBrMissing = "Error missing closing bracket",
-	
+	CloseBrMissing = "Error missing closing bracket",	
 }
 
-VARS = {}
-function eval(num1, operator, num2)
-    if operator == '+' then
-        return num1 + num2
-    elseif operator == '-' then
-        return num1 - num2
-    elseif operator == '*' then
-        return num1 * num2
-    elseif operator == '/' then
-        return num1 / num2
-    elseif operator == '=' then
-        VARS[num1] = num2
-        return num1 .. "=" .. num2    
-    else
-        return num1
-    end
-end
-function getValue(var)
-	return VARS[var]
+function interpret(str)
+	print(str)
+	return str
 end	
 
-function interpret( ... )
-	local args = {...}
-	local out = ""
-	for i=1,#args do
-		out = out .. args[i]
-	end
-	print(out)
-	return args
-end
 
 
 local grammar = P {
 	"program",
-	program = Ct((V"Cmd"/interpret + V"Exp"/interpret)^0),
-	Cmd =  V"var" * token(C(P("="))) * (V"Exp"+T"expErr")/eval,
-	Exp = V"Term" * ( token(C(S('+-'))) * (V"Term"+T"termErr") )^0/eval,
-	Term = V"Factor" * ( token(C(S('*/'))) * (V"Factor"+T"factorErr") )^0/eval,
-	Factor = V"num" + V"var"/getValue + ( token(P("(")) * (V"Exp"+T"expErr") * (token(P(")")) + T"CloseBrMissing") )/eval,
+	program = Ct((V"Cmd" + V"Exp")^0),
+	Cmd =  V"var" * token(P("=")) * (V"Exp"+T"expErr"),
+	Exp = V"Term" * ( token(S('+-')) * (V"Term"+T"termErr") )^0,
+	Term = V"Factor" * ( token(S('*/')) * (V"Factor"+T"factorErr") )^0,
+	Factor = V"num" + V"var" + ( token(P("(")) * (V"Exp"+T"expErr") * (token(P(")")) + T"CloseBrMissing") ),
 	num = token(C(pm * digits * maybe(dot*digits) * maybe(pow*pm*digits))/tonumber) ,
 	var = token(C((lpeg.alpha+P'_') * (lpeg.alnum+P'_')^0)) ,
 	spaces = P(lpeg.space)^0,
