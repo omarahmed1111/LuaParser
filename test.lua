@@ -55,6 +55,11 @@ r, e = parse(test10)
 assert(r=="a=4")
 print("'" ..test10 .. "' -> matched successfully")
 
+test11 = "a = 3 * 2   b = a + 1"
+r, e = parse(test11)
+assert(r=="a=6")
+print("'" ..test11 .. "' -> matched successfully")
+
 --failed tests
 ftest1 = " 88 + "
 r, e, err = parse(ftest1)
