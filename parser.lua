@@ -52,16 +52,15 @@ function interpret( ... )
 		out = out .. args[i]
 	end
 	print(out)
-	return args
+	return out
 end
-
 
 local grammar = P {
 	"program",
-	program = Ct((V"Cmd"/interpret + V"Exp"/interpret)^0),
+	program = ((V"Cmd"/interpret + V"Exp"/interpret)^0),
 	Cmd =  V"var" * token(C(P("="))) * (V"Exp"+T"expErr")/eval,
-	Exp = V"Term" * ( token(C(S('+-'))) * (V"Term"+T"termErr") )^0/eval,
-	Term = V"Factor" * ( token(C(S('*/'))) * (V"Factor"+T"factorErr") )^0/eval,
+	Exp = V"Term" * ( token(C(S('+-'))) * (V"Term"+T"termErr") )^0 /eval,
+	Term = V"Factor" * ( token(C(S('*/'))) * (V"Factor"+T"factorErr") )^0 /eval,
 	Factor = V"num" + V"var"/getValue + ( token(P("(")) * (V"Exp"+T"expErr") * (token(P(")")) + T"CloseBrMissing") )/eval,
 	num = token(C(pm * digits * maybe(dot*digits) * maybe(pow*pm*digits))/tonumber) ,
 	var = token(C((lpeg.alpha+P'_') * (lpeg.alnum+P'_')^0)) ,

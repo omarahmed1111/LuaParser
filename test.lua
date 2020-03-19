@@ -4,62 +4,55 @@ local parser = require "parser"
 local parse = parser.parse
 
 --success tests
-test1 = "s"
+test1 = "s=7*7"
 r, e = parse(test1)
-assert(e==nil)
+print(r)
+assert(r=="s=49")
 print("'" ..test1 .. "' -> matched successfully")
---print("tokens:" ..r)
 
 test2 = " s = 1"
 r, e = parse(test2)
-assert(e==nil)
+assert(r=="s=1")
 print("'" ..test2 .. "' -> matched successfully")
---print("tokens:" ..r)
 
 test3 = " s =     100000e3"
 r, e = parse(test3)
-assert(e==nil)
+assert(r=="s=100000000.0")
 print("'" ..test3 .. "' -> matched successfully")
---print("tokens:" ..r)
 
 test4 = " 444444 "
 r, e = parse(test4)
-assert(e==nil)
+assert(r=="444444")
 print("'" ..test4 .. "' -> matched successfully")
---print("tokens:" ..r)
 
 test5 = " 8+7*(88+9)"
 r, e = parse(test5)
-assert(e==nil)
+assert(r=="687")
 print("'" ..test5 .. "' -> matched successfully")
---print("tokens:" ..r)
 
 test6 = " id = 8+7*(88+9)"
 r, e = parse(test6)
-assert(e==nil)
+assert(r=="id=687")
 print("'" ..test6 .. "' -> matched successfully")
---print("tokens:" ..r)
 
-test7 = " id   = 8+7*(88+9) + ((7e2*3) -(88.4+5.3))"
+test7 = " id   = 8+7*(88+9)+((7e2*2) -(88+5))"
 r, e = parse(test7)
-assert(e==nil)
+assert(r=="id=687")
 print("'" ..test7 .. "' -> matched successfully")
---print("tokens:" ..r)
 
 test8 = "id = (8) * ((7)) "
 r, e = parse(test8)
-assert(e==nil)
+assert(r=="id=56")
 print("'" ..test8 .. "' -> matched successfully")
---print("tokens:" ..r)
 
 test9 = "a=4 b=7"
 r, e = parse(test9)
-assert(e==nil)
+assert(r=="a=4")
 print("'" ..test9 .. "' -> matched successfully")
 
 test10 = "a=4 b=a+4"
 r, e = parse(test10)
-assert(e==nil)
+assert(r=="a=4")
 print("'" ..test10 .. "' -> matched successfully")
 
 --failed tests
