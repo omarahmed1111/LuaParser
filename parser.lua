@@ -57,7 +57,7 @@ end
 
 local grammar = P {
 	"program",
-	program = ((V"Cmd"/interpret + V"Exp"/interpret)^0),
+	program = (V"Cmd"/interpret + V"Exp"/interpret)^0,
 	Cmd =  V"var" * token(C(P("="))) * (V"Exp"+T"expErr")/eval,
 	Exp = V"Term" * ( token(C(S('+-'))) * (V"Term"+T"termErr") )^0 /eval,
 	Term = V"Factor" * ( token(C(S('*/'))) * (V"Factor"+T"factorErr") )^0 /eval,
