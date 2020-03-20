@@ -2,7 +2,7 @@
 
 local lpeg = require 'lpeglabel'
 local re = require 'relabel'
-local tostring = require 'ml'.tstring
+--local tostring = require 'ml'.tstring
 lpeg.locale(lpeg)
 
 local P,R,S,B,V,C,Ct,Cmt,Cp,Cc,T = lpeg.P,lpeg.R,lpeg.S,lpeg.B,lpeg.V,lpeg.C,lpeg.Ct,lpeg.Cmt,
@@ -24,7 +24,7 @@ local terror = {
 	
 }
 
-VARS = {}
+local VARS = {}
 function eval(num1, operator, num2)
     if operator == '+' then
         return num1 + num2
